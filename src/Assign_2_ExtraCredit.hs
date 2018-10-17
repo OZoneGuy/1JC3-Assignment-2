@@ -16,18 +16,17 @@ newtype Vector4 a = Vector4 (a,a,a,a)
   deriving (Show,Eq)
 
 class VectorSpace v where
-  vecZero       :: (Num a) => v a
-  vecSum        :: (Num a) => v a -> v a -> v a
-  vecScalarProd :: (Num a) => a -> v a -> v a
-  vecMagnitude  :: (Floating a) => v a -> a
-  vecInnerProd  :: (Num a) => v a -> v a -> a
-  dim           :: (Num a) => Int -> v a -> a   --used to get individual values from vector
-  dist          :: (Floating a) => v a -> v a -> a
-
-vecF :: (Floating a, Ord a, VectorSpace v) => v a -> [v a] -> (v a, v a)
-vecF v vs = let
-  dists = map (dist v) vs
-  in (vs !! fromJust (elemIndex (minimum dists) dists), vs !! fromJust ( elemIndex (maximum dists) dists))
+  vecZero       :: (Num a) => v a -- returns a vector with 0 magnitude
+  vecSum        :: (Num a) => v a -> v a -> v a --  adds two vectors
+  vecScalarProd :: (Num a) => a -> v a -> v a -- multiplies a vector with a scalar wuantity
+  vecMagnitude  :: (Floating a) => v a -> a -- Finds the magnitude of a vector, onlu accepts float
+  vecInnerProd  :: (Num a) => v a -> v a -> a -- Finds the dot product of the vector
+  dist          :: (Floating a) => v a -> v a -> a -- Finds the distance between two vectors, only accepts float
+  dim           :: (Num a) => Int -> v a -> a
+  {--used to get individual values from vectors,
+  --could have used "func (Vectorx(n11, n12)) ..."
+  --but this method semes easier to read
+  --}
 
 instance VectorSpace Vector2 where
 
@@ -63,7 +62,6 @@ instance VectorSpace Vector3 where
 
   dist v1 v2 = sqrt((dim 0 v1 - dim 0 v2)^2 + (dim 1 v1 - dim 1 v2)^2 + (dim 2 v1 - dim 2 v2)^2)
 
-
 instance VectorSpace Vector4 where
   dim x (Vector4 (a,b,c,d)) | x == 0 = a
                             | x == 1 = b
@@ -81,3 +79,8 @@ instance VectorSpace Vector4 where
   vecInnerProd v1 v2 = dim 0 v1 * dim 0 v2 + dim 1 v1 * dim 1 v2 + dim 2 v1 * dim 2 v2 + dim 3 v1 * dim 3 v2
 
   dist v1 v2 = sqrt((dim 0 v1 - dim 0 v2)^2 + (dim 1 v1 - dim 1 v2)^2 + (dim 2 v1 - dim 2 v2)^2 + (dim 3 v1 - dim 3 v2)^2)
+
+vecF :: (Floating a, Ord a, VectorSpace v) => v a -> [v a] -> (v a, v a)
+vecF v vs = let
+  dists = map (dist v) vs
+  in (vs !! fromJust (elemIndex (minimum dists) dists), vs !! fromJust ( elemIndex (maximum dists) dists))
